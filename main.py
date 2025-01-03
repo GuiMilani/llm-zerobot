@@ -16,7 +16,17 @@ if __name__ == "__main__":
     arquivo_csv_entrada = "zerobot_enunciados.csv" 
     arquivo_csv_saida = "zerobot_novas_solucoes.csv"
     
-    query = "SELECT id, activity.activity_id, enunciated, observations, xml FROM public.solution JOIN(SELECT id AS activity_id, enunciated, observations FROM public.activity) AS activity ON public.solution.activity_id = activity.activity_id ORDER BY id ASC LIMIT 15"
+    query = f"""
+    SELECT activity.activity_id, MAX(enunciated) AS enunciated, MAX(observations) AS observations, string_agg(xml, ', ') AS xml 
+    FROM public.solution 
+    JOIN(
+        SELECT id AS activity_id, enunciated, observations 
+        FROM public.activity
+    ) AS activity 
+    ON public.solution.activity_id = activity.activity_id
+    GROUP BY activity.activity_id
+    ORDER BY activity.activity_id ASC LIMIT 15
+    """
     colnames, rows = fetch_data_from_db(query, db_params)
     
     if colnames and rows:

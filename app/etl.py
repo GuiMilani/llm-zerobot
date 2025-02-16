@@ -1,5 +1,30 @@
 import psycopg2
 import csv
+import time
+from psycopg2 import OperationalError
+
+
+def wait_for_db(db_params, timeout, interval):
+    """
+    Aguarda até que a conexão com o banco de dados seja estabelecida.
+    timeout: tempo máximo de espera em segundos
+    interval: intervalo entre as tentativas de conexão em segundos
+    """
+    
+    start_time = time.time()
+    while True:
+        try:
+            conn = psycopg2.connect(**db_params)
+            conn.close()
+            print("Banco de dados disponível!")
+            break
+        except OperationalError as e:
+            elapsed = time.time() - start_time
+            if elapsed > timeout:
+                print("Tempo de espera esgotado. Não foi possível conectar ao banco de dados.")
+                raise e
+            print(f"Banco não disponível, aguardando... ({elapsed:.0f}s)")
+            time.sleep(interval)
 
 def fetch_data_from_db(query, db_params):
     try:

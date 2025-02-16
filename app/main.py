@@ -1,6 +1,6 @@
 # Executar o script
 import os
-from etl import fetch_data_from_db, save_to_csv
+from etl import wait_for_db, fetch_data_from_db, save_to_csv
 from script import process_csv
 
 if __name__ == "__main__":
@@ -11,6 +11,11 @@ if __name__ == "__main__":
         'host': os.getenv('DB_HOST'),
         'port': os.getenv('DB_PORT')
     }
+
+    # Aguarda o banco de dados estar disponível antes de executar o restante do código
+    wait_for_db(db_params, 60, 5)
+    
+    print("Executando o main.py")
 
     # Caminhos dos arquivos CSV de entrada e saída
     arquivo_csv_entrada = "zerobot_enunciados.csv" 

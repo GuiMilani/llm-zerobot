@@ -18,3 +18,5 @@ services:
       - .env
     depends_on:
       - db
+    volumes:
+      - ./app:/usr/src/app
